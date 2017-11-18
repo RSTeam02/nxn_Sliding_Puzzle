@@ -1,5 +1,6 @@
 # NxN Sliding Puzzle
 
++ test link: https://rsteam02.github.io/nxn_Sliding_Puzzle/
 + numeric sliding puzzle, select range from 2x2 to 30x30 raster
 + scalable svg tiles 
 + init raster preview => solution state, shuffled => when game starts
