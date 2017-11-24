@@ -15,22 +15,19 @@ export class Controller {
 
     constructor() {
         this.solution = [];
-        this.mode();
-        this.allFormat = document.getElementById("slider");
-        this.showFormat(this.allFormat.value);
+        this.mode();       
         this.removeEvent = new CustomEvent("removeListener");
         this.initRaster(true);
         this.btnListener();
-    }
+        this.formatInfo();
+    }   
 
-    showFormat(n) {
-        document.getElementById("formatInfo").innerHTML = "Format: " + n + "x" + n;
+    formatInfo(){
+        let n = Math.sqrt(this.nxn + 1);
+        $("#formatInfo").html(`Format: ${n}x${n}`);
     }
-
     btnListener() {
-
-        $("#slider, .mode, #buildBtn").on('input click', (event) => {
-            this.showFormat(parseInt($('#slider').val()));
+        $("#slider, .mode, #buildBtn").on('input click', (event) => {            
             this.initRaster(true);
         });
 
@@ -174,18 +171,19 @@ export class Controller {
 
         dim = ($('#integer').is(':checked')) ? parseInt($('#slider').val()) : wChunk.sqSide;
         this.tileArr = this.tileMat.createTileMat(dim, dim);
-        this.nxn = Math.pow(dim, 2) - 1;
+        this.nxn = Math.pow(dim, 2) - 1;       
         if (preview) {
             seq = new Shuffle().previewOrder(this.tileArr);
             this.initView(seq, dim, wChunk);
             this.solution = this.initSolution();
-            document.getElementById("shape" + this.nxn).setAttribute("fill", "black");
+            document.getElementById(`shape${this.nxn}`).setAttribute("fill", "black");
         } else {
             seq = new Shuffle().randomOrder(this.tileArr);
             this.initView(seq, dim, wChunk);
             this.initSeq(seq);
         }
         this.view.playerInfo("");
+        this.formatInfo();
     }
 
     //control direction each tile
