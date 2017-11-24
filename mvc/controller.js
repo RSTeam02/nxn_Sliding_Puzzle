@@ -15,11 +15,11 @@ export class Controller {
 
     constructor() {
         this.solution = [];
+        this.mode();
         this.allFormat = document.getElementById("slider");
         this.showFormat(this.allFormat.value);
         this.removeEvent = new CustomEvent("removeListener");
-        this.dim = parseInt(this.allFormat.value);
-        this.initRaster(this.dim, true);
+        this.initRaster(true);
         this.btnListener();
     }
 
@@ -29,11 +29,14 @@ export class Controller {
 
     btnListener() {
 
-        $("#slider, .gmode").on('input', () => {
+        $("#slider, .mode, #buildBtn").on('input click', (event) => {
             this.showFormat(parseInt($('#slider').val()));
             this.initRaster(true);
         });
 
+        $(".mode").on('click', () => {
+            this.mode();
+        });
 
         $("#ng").click(() => {
             //game starts => preview mode false
@@ -42,9 +45,21 @@ export class Controller {
         });
     }
 
-    initView(seq, dim) {
-        this.view = new View(seq, this.mode);
+    initView(seq, dim, wc) {
+        this.view = new View($('#integer').is(':checked'), seq, dim, wc);
         this.view.svgMat();
+    }
+
+    mode() {
+        if ($('#integer').is(':checked')) {
+            $("#slider").show();
+            $("#txtInput").hide();
+            $("#buildBtn").hide();
+        } else {
+            $("#slider").hide();
+            $("#txtInput").show();
+            $("#buildBtn").show();
+        }
     }
 
     //mxn tiles react on clicks, events
@@ -72,6 +87,49 @@ export class Controller {
                 })();
             }
         }
+    }
+
+    //string in chunks, fill spaces with hashtags
+    wordChunk() {
+        var word = $("#txtInput").val().split(" ");
+        var charArrStatic = [];
+        var charArr = [];
+        var numOfChar = 0;
+        var chars;
+        var chunks = {};
+        var gtRowCol;
+
+        for (let i = 0; i < word.length; i++) {
+            chars = word[i].split("|");
+            if (chars.length > numOfChar) {
+                numOfChar = chars.length;
+            }
+            charArr.push(chars);
+        }
+
+        for (let i = 0; i < word.length; i++) {
+            if (charArr[i].length < numOfChar) {
+                let addHash = numOfChar - charArr[i].length;
+                for (let j = 0; j < addHash; j++) {
+                    charArr[i].push("#");
+                }
+            }
+            charArrStatic.push.apply(charArrStatic, charArr[i]);
+        }
+        gtRowCol = (word.length > numOfChar) ? word.length : numOfChar;
+
+        let diff = Math.pow(gtRowCol, 2) - charArrStatic.length;
+        for (let i = 0; i <= diff; i++) {
+            charArrStatic.push("#");
+        }
+        chunks = {
+            str: charArrStatic,
+            numOfWord: word.length,
+            gtNumOfChar: numOfChar,
+            sqSide: gtRowCol
+        }
+
+        return chunks;
     }
 
     //init solution for comparison
@@ -108,25 +166,28 @@ export class Controller {
 
     //preview === ordered, solution state, !preview === when game starts, random state, tiles reacts on events
     initRaster(preview) {
+        let wChunk = this.wordChunk();
         let seq = [];
         this.tileMat = new TileMatrix();
-        let dim = parseInt($('#slider').val());
+        let dim = 0;
+        this.evaluation = new Evaluation();
+
+        dim = ($('#integer').is(':checked')) ? parseInt($('#slider').val()) : wChunk.sqSide;
         this.tileArr = this.tileMat.createTileMat(dim, dim);
         this.nxn = Math.pow(dim, 2) - 1;
-        this.evaluation = new Evaluation();
         if (preview) {
             seq = new Shuffle().previewOrder(this.tileArr);
-            this.initView(seq, dim);
+            this.initView(seq, dim, wChunk);
             this.solution = this.initSolution();
             document.getElementById("shape" + this.nxn).setAttribute("fill", "black");
         } else {
             seq = new Shuffle().randomOrder(this.tileArr);
-            this.initView(seq, dim);
+            this.initView(seq, dim, wChunk);
             this.initSeq(seq);
         }
         this.view.playerInfo("");
-
     }
+
     //control direction each tile
     xyControl(tile, x, lastElement) {
         lastElement = document.getElementById("shape" + lastElement);

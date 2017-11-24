@@ -38,7 +38,7 @@
     </style>
 
 </head>
-<h2>Numeric Sliding-Puzzle NxN</h2>
+<h2>Sliding-Puzzle NxN</h2>
 
 <body>
     <svg id="svgContent" version="1.1">
@@ -46,16 +46,21 @@
     </svg>
     <p id="pInfo" class="txt"></p>
     <form name="selector">
-
         <fieldset>
             <legend id="formatInfo">
             </legend>
             <fieldset>
-                <input class="mxn" type="range" min="2" max="30" value="2" id="slider">
+                <input class="mode" type="radio" id="integer" name="intChar" checked>Integer Mode</input>
+                <input class="mode" type="radio" id="builder" name="intChar">Puzzle Builder</input>
             </fieldset>
+            <fieldset>
+                <input class="mxn" type="range" min="2" max="30" value="2" id="slider">
+                <input type="text" id="txtInput" value="O|h|n|e F|l|ei|ß k|e|i|n Pr|ei|s|!">
+                <input type="button" value="build puzzle" id="buildBtn">
+            </fieldset>
+            <input type="button" value="new game" id="ng">            
         </fieldset>
-        <input type="button" value="new game" id="ng" class="mxn">
-
+        
     </form>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
     <script src="main.js" type="module"></script>

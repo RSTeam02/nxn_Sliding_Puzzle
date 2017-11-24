@@ -1,6 +1,7 @@
 export class SVGDom {
 
 
+
     svgNum(tile) {
 
         let numMode;
@@ -31,13 +32,11 @@ export class SVGDom {
         square.setAttribute("height", 30);
         square.setAttribute("stroke", "black");
         square.setAttribute("stroke-width", "1");
-        square.setAttribute("fill", "none");
-        alphaNum = val;
+        square.setAttribute("fill", "none");   
+        alphaNum = (tile.mode) ? val : tile.chunk[val - 1];
         numMode = document.createTextNode(alphaNum);
         txt.setAttribute("value", alphaNum);
         txt.appendChild(numMode);
         gId.appendChild(square);
         gId.appendChild(txt);
-    }
-
-}
+    }}
