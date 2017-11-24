@@ -14,8 +14,7 @@ export class View extends SVGDom{
         this.mode = mode
         this.dim =dim;
         this.seq = seq;
-        this.displaySize();
-        console.log(this.chunk.str)
+        this.displaySize();        
     }
 
     //mat output as svg
@@ -23,8 +22,6 @@ export class View extends SVGDom{
         let y = 0;
         let id = 0;
         let n=0;
-        let gtRowCol = 0;
-
     
         for (var i = 0; i < this.dim; i++) {
             var x = 0;

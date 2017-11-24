@@ -119,7 +119,7 @@ export class Controller {
         gtRowCol = (word.length > numOfChar) ? word.length : numOfChar;
 
         let diff = Math.pow(gtRowCol, 2) - charArrStatic.length;
-        for (let i = 0; i <= diff; i++) {
+        for (let i = 0; i < diff; i++) {
             charArrStatic.push("#");
         }
         chunks = {
