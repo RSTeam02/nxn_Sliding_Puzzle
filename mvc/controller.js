@@ -15,19 +15,19 @@ export class Controller {
 
     constructor() {
         this.solution = [];
-        this.mode();       
+        this.mode();
         this.removeEvent = new CustomEvent("removeListener");
         this.initRaster(true);
         this.btnListener();
         this.formatInfo();
-    }   
+    }
 
-    formatInfo(){
-        let n = Math.sqrt(this.nxn + 1);
-        $("#formatInfo").html(`Format: ${n}x${n}`);
+    formatInfo() {
+        let n = Math.sqrt(this.mxn + 1);
+        $("#formatInfo").html(`Format: ${this.mxn.m}x${this.mxn.n}`);
     }
     btnListener() {
-        $("#slider, .mode, #buildBtn").on('input click', (event) => {            
+        $("#slider, .mode, #buildBtn").on('input click', (event) => {
             this.initRaster(true);
         });
 
@@ -42,8 +42,8 @@ export class Controller {
         });
     }
 
-    initView(seq, dim, wc) {
-        this.view = new View($('#integer').is(':checked'), seq, dim, wc);
+    initView(seq, wc) {
+        this.view = new View($('#integer').is(':checked'), seq, this.mxn, wc);
         this.view.svgMat();
     }
 
@@ -61,16 +61,18 @@ export class Controller {
 
     //mxn tiles react on clicks, events
     tileListener() {
-        //handler/listener for each tile, compare with solution after each shift  
+        //handler/listener for each tile, compare with solution after each shift 
+
         for (let i = 0; i < this.tileArr.length; i++) {
             for (let j = 0; j < this.tileArr[i].length; j++) {
+                //console.log(this.tileArr.length +" " +this.tileArr[i].length)
                 (() => {
                     let handler = () => {
                         this.xyControl(this.tileArr[i][j].sId, this.tileArr[i][j].swapVal - 1, (this.tileArr.length * this.tileArr[i].length) - 1);
                         this.evaluation.evaluate((cb) => {
                             if (cb === "Solved!") {
                                 this.view.playerInfo(cb);
-                                document.getElementById("shape" + this.nxn).setAttribute("fill", "black");
+                                document.getElementById("shape" + ((this.mxn.m * this.mxn.n) - 1)).setAttribute("fill", "black");
                                 document.dispatchEvent(this.removeEvent);
                             }
                         }, this.solution);
@@ -93,8 +95,6 @@ export class Controller {
         var charArr = [];
         var numOfChar = 0;
         var chars;
-        var chunks = {};
-        var gtRowCol;
 
         for (let i = 0; i < word.length; i++) {
             chars = word[i].split("|");
@@ -113,20 +113,13 @@ export class Controller {
             }
             charArrStatic.push.apply(charArrStatic, charArr[i]);
         }
-        gtRowCol = (word.length > numOfChar) ? word.length : numOfChar;
 
-        let diff = Math.pow(gtRowCol, 2) - charArrStatic.length;
-        for (let i = 0; i < diff; i++) {
-            charArrStatic.push("#");
-        }
-        chunks = {
-            str: charArrStatic,
-            numOfWord: word.length,
-            gtNumOfChar: numOfChar,
-            sqSide: gtRowCol
+        this.mxn = {
+            n: numOfChar,
+            m: word.length
         }
 
-        return chunks;
+        return charArrStatic;
     }
 
     //init solution for comparison
@@ -134,7 +127,7 @@ export class Controller {
         let solutionArr = [];
         let allId = document.getElementsByClassName("pos");
 
-        for (let i = 0; i < Math.pow(this.tileArr.length, 2); i++) {
+        for (let i = 0; i < (this.mxn.m * this.mxn.n); i++) {
             solutionArr[i] = `${allId[i].getAttribute("value")}=${allId[i].getAttribute("x")},${allId[i].getAttribute("y")}`;
         }
         return solutionArr;
@@ -169,17 +162,22 @@ export class Controller {
         let dim = 0;
         this.evaluation = new Evaluation();
 
-        dim = ($('#integer').is(':checked')) ? parseInt($('#slider').val()) : wChunk.sqSide;
-        this.tileArr = this.tileMat.createTileMat(dim, dim);
-        this.nxn = Math.pow(dim, 2) - 1;       
+        if ($('#integer').is(':checked')) {
+            this.mxn = {
+                m: parseInt($('#slider').val()),
+                n: parseInt($('#slider').val())
+            }
+        }
+        this.tileArr = this.tileMat.createTileMat(this.mxn.m, this.mxn.n);
+
         if (preview) {
             seq = new Shuffle().previewOrder(this.tileArr);
-            this.initView(seq, dim, wChunk);
+            this.initView(seq, wChunk);
             this.solution = this.initSolution();
-            document.getElementById(`shape${this.nxn}`).setAttribute("fill", "black");
+            document.getElementById(`shape${((this.mxn.m * this.mxn.n) - 1)}`).setAttribute("fill", "black");
         } else {
-            seq = new Shuffle().randomOrder(this.tileArr);
-            this.initView(seq, dim, wChunk);
+            seq = new Shuffle().randomOrder(this.tileArr, this.mxn);
+            this.initView(seq, wChunk);
             this.initSeq(seq);
         }
         this.view.playerInfo("");
@@ -187,7 +185,7 @@ export class Controller {
     }
 
     //control direction each tile
-    xyControl(tile, x, lastElement) {
+    xyControl(tile, x, lastElement) {        
         lastElement = document.getElementById("shape" + lastElement);
         //swap rows with last, avoid collisions y-axis 
         if (parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x"))) {
