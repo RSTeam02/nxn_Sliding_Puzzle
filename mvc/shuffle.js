@@ -8,8 +8,9 @@ export class Shuffle {
      */
 
 
-    constructor() {
-        this.arr = []
+    constructor(mxn) {
+        this.arr = [];
+        this.mxn = mxn;
 
     }
 
@@ -27,21 +28,21 @@ export class Shuffle {
     }
 
 
-    randomOrder(arr, mxn) {
+    randomOrder(arr) {
         this.arr = arr;
         var shuffled = [];
 
         do {
             for (let i = 0; i < this.arr.length; i++) {
                 for (let j = 0; j < this.arr[i].length; j++) {
-                    let h = Math.floor(Math.random() * mxn.m);
-                    let v = Math.floor(Math.random() * mxn.n);
+                    let h = Math.floor(Math.random() * this.mxn.m);
+                    let v = Math.floor(Math.random() * this.mxn.n);
                     let tmp = this.arr[i][j];
                     this.arr[i][j] = this.arr[h][v];
                     this.arr[h][v] = tmp;
                 }
             }
-        } while (!this.solvable(mxn));
+        } while (!this.solvable());
 
         for (let i = 0; i < this.arr.length; i++) {
             shuffled[i] = []
@@ -79,7 +80,7 @@ export class Shuffle {
         let shift = 0;
         let tileNum = j * this.arr.length + i;
         let tileVal = this.arr[i][j].y * this.arr.length + this.arr[i][j].x;
-        let last = Math.pow(this.arr.length, 2);
+        let last = this.mxn.m * this.mxn.n;
 
         for (var i = tileNum + 1; i < last; i++) {
             var h = i % this.arr.length;
@@ -102,14 +103,17 @@ export class Shuffle {
         return shift;
     }
 
-    solvable(mxn) {
+    solvable() {
         /*every game should have the same number inversions (shuffling degree?) of the average, except phrase mode 
         => a letter could occur more than 1 time.*/
         //if (this.sumInv() === avgInv) {
         /*when last (empty) element in the right bottom corner &&
         ( (grid width odd) && (#inversions even) )  ||  ( (grid width even) && ((blank on odd row from bottom) == (#inversions even)) )*/
-        if (this.arr[mxn.m - 1][mxn.n - 1].val === (mxn.m * mxn.n)) {
-            if ((mxn.m % 2 !== 0 && this.sumInv() % 2 === 0) || (mxn.m % 2 === 0 && this.arr[mxn.m - 1][mxn.m - 1].x % 2 !== this.sumInv() % 2) && this.arr[mxn.m - 1][mxn.m - 1].y % 2 !== this.sumInv() % 2) {
+        if (this.arr[this.mxn.m - 1][this.mxn.n - 1].val === (this.mxn.m * this.mxn.n)) {
+            if ((this.mxn.m % 2 !== 0 && this.sumInv() % 2 === 0)
+                || (this.mxn.m % 2 === 0 && this.arr[this.mxn.m - 1][this.mxn.n - 1].x % 2 !== this.sumInv() % 2)
+                && (this.mxn.n % 2 !== 0 && this.sumInv() % 2 === 0)
+                || (this.mxn.n % 2 === 0 && this.arr[this.mxn.m - 1][this.mxn.n - 1].y % 2 !== this.sumInv() % 2)) {
                 return true;
             }
         }

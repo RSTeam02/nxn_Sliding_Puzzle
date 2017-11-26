@@ -171,12 +171,12 @@ export class Controller {
         this.tileArr = this.tileMat.createTileMat(this.mxn.m, this.mxn.n);
 
         if (preview) {
-            seq = new Shuffle().previewOrder(this.tileArr);
+            seq = new Shuffle(this.mxn).previewOrder(this.tileArr);
             this.initView(seq, wChunk);
             this.solution = this.initSolution();
             document.getElementById(`shape${((this.mxn.m * this.mxn.n) - 1)}`).setAttribute("fill", "black");
         } else {
-            seq = new Shuffle().randomOrder(this.tileArr, this.mxn);
+            seq = new Shuffle(this.mxn).randomOrder(this.tileArr);
             this.initView(seq, wChunk);
             this.initSeq(seq);
         }
