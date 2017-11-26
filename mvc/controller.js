@@ -14,17 +14,36 @@ import { Evaluation } from "./evaluation.js";
 export class Controller {
 
     constructor() {
+        this.mxn = {
+            row: 0,
+            col: 0
+        }
         this.solution = [];
         this.mode();
         this.removeEvent = new CustomEvent("removeListener");
         this.initRaster(true);
         this.btnListener();
         this.formatInfo();
+
     }
 
+
+    setRow(m) {
+        this.mxn.row = m;
+    }
+
+    setCol(n) {
+        this.mxn.col = n;
+    }
+
+    getRC() {
+        return this.mxn;
+    }
+
+
     formatInfo() {
-        let n = Math.sqrt(this.mxn + 1);
-        $("#formatInfo").html(`Format: ${this.mxn.m}x${this.mxn.n}`);
+
+        $("#formatInfo").html(`Format: ${this.getRC().row}x${this.getRC().col}`);
     }
     btnListener() {
         $("#slider, .mode, #buildBtn").on('input click', (event) => {
@@ -43,7 +62,13 @@ export class Controller {
     }
 
     initView(seq, wc) {
-        this.view = new View($('#integer').is(':checked'), seq, this.mxn, wc);
+        let viewProp={
+            mode: $('#integer').is(':checked'),
+            chunkSeq: seq,
+            rowCol: this.getRC(),
+            wordChunk: wc
+        }
+        this.view = new View(viewProp);
         this.view.svgMat();
     }
 
@@ -72,7 +97,7 @@ export class Controller {
                         this.evaluation.evaluate((cb) => {
                             if (cb === "Solved!") {
                                 this.view.playerInfo(cb);
-                                document.getElementById("shape" + ((this.mxn.m * this.mxn.n) - 1)).setAttribute("fill", "black");
+                                document.getElementById("shape" + ((this.getRC().row * this.getRC().col) - 1)).setAttribute("fill", "black");
                                 document.dispatchEvent(this.removeEvent);
                             }
                         }, this.solution);
@@ -113,21 +138,25 @@ export class Controller {
             }
             charArrStatic.push.apply(charArrStatic, charArr[i]);
         }
-
-        this.mxn = {
-            n: numOfChar,
-            m: word.length
+        
+        if ($('#integer').is(':checked')) {
+            this.setRow(parseInt($('#slider').val()));
+            this.setCol(parseInt($('#slider').val()));
+        } else {
+            this.setRow(word.length);
+            this.setCol(numOfChar);
         }
 
         return charArrStatic;
     }
+
 
     //init solution for comparison
     initSolution() {
         let solutionArr = [];
         let allId = document.getElementsByClassName("pos");
 
-        for (let i = 0; i < (this.mxn.m * this.mxn.n); i++) {
+        for (let i = 0; i < (this.getRC().row * this.getRC().col); i++) {
             solutionArr[i] = `${allId[i].getAttribute("value")}=${allId[i].getAttribute("x")},${allId[i].getAttribute("y")}`;
         }
         return solutionArr;
@@ -159,24 +188,16 @@ export class Controller {
         let wChunk = this.wordChunk();
         let seq = [];
         this.tileMat = new TileMatrix();
-        let dim = 0;
         this.evaluation = new Evaluation();
-
-        if ($('#integer').is(':checked')) {
-            this.mxn = {
-                m: parseInt($('#slider').val()),
-                n: parseInt($('#slider').val())
-            }
-        }
-        this.tileArr = this.tileMat.createTileMat(this.mxn.m, this.mxn.n);
+        this.tileArr = this.tileMat.createTileMat(this.getRC());
 
         if (preview) {
-            seq = new Shuffle(this.mxn).previewOrder(this.tileArr);
+            seq = new Shuffle().previewOrder(this.tileArr);
             this.initView(seq, wChunk);
             this.solution = this.initSolution();
-            document.getElementById(`shape${((this.mxn.m * this.mxn.n) - 1)}`).setAttribute("fill", "black");
+            document.getElementById(`shape${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("fill", "black");
         } else {
-            seq = new Shuffle(this.mxn).randomOrder(this.tileArr);
+            seq = new Shuffle().randomOrder(this.tileArr);
             this.initView(seq, wChunk);
             this.initSeq(seq);
         }
@@ -185,7 +206,7 @@ export class Controller {
     }
 
     //control direction each tile
-    xyControl(tile, x, lastElement) {        
+    xyControl(tile, x, lastElement) {
         lastElement = document.getElementById("shape" + lastElement);
         //swap rows with last, avoid collisions y-axis 
         if (parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x"))) {

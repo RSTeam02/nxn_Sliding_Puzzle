@@ -8,12 +8,12 @@ import { SVGDom } from "./svgDom.js";
 export class View extends SVGDom{
 
     //draw eachtile as svg text/square
-    constructor(mode, seq, mxn, chunk) {
+    constructor(prop) {
         super();     
-        this.chunk = chunk;
-        this.mode = mode
-        this.mxn =mxn;
-        this.seq = seq;
+        this.seq = prop.chunkSeq;
+        this.chunk = prop.wordChunk;
+        this.mode = prop.mode;
+        this.rcLen = prop.rowCol;        
         this.displaySize();        
     }
 
@@ -23,18 +23,18 @@ export class View extends SVGDom{
         let id = 0;
         let n=0;
     
-        for (var i = 0; i < this.mxn.m; i++) {
+        for (var i = 0; i < this.rcLen.row; i++) {
             var x = 0;
-            for (var j = 0; j < this.mxn.n; j++) {
+            for (var j = 0; j < this.rcLen.col; j++) {
                 let tile = {
                     tileId: id,
+                    seq: this.seq,
                     posX: x,
-                    posY: y,
-                    mxn: this.seq.length,
+                    posY: y,        
                     mode: this.mode,
                     chunk: this.chunk
                 };
-                super.svgNum(tile);
+                super.svgCharNum(tile);
                 //next row
                 x += 30;
                 id++;
@@ -47,8 +47,8 @@ export class View extends SVGDom{
     
     //scale size for nxn
     displaySize() {
-        this.w = this.mxn.n * 50 + 10;
-        this.h = Math.floor((this.mxn.m * 50 + 10) / 1.55);
+        this.w = this.rcLen.col * 50 + 10;
+        this.h = Math.floor((this.rcLen.row * 50 + 10) / 1.55);
     }
 
     playerInfo(str) {

@@ -12,14 +12,14 @@ export class TileMatrix {
     }
 
     //init matrix of tile instances, store properties
-    createTileMat(row, column) {
+    createTileMat(rowCol) {
 
         var tiles = [];
         var val = 0;
 
-        for (var i = 0; i < row; i++) {
+        for (var i = 0; i < rowCol.row; i++) {
             tiles[i] = [];
-            for (var j = 0; j < column; j++) {
+            for (var j = 0; j < rowCol.col; j++) {
                 tiles[i][j] = new Tile();
                 tiles[i][j].val = val + 1;
                 tiles[i][j].x = i;
