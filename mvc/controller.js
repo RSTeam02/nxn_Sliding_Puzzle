@@ -62,7 +62,7 @@ export class Controller {
     }
 
     initView(seq, wc) {
-        let viewProp={
+        let viewProp = {
             mode: $('#integer').is(':checked'),
             chunkSeq: seq,
             rowCol: this.getRC(),
@@ -77,10 +77,14 @@ export class Controller {
             $("#slider").show();
             $("#txtInput").hide();
             $("#buildBtn").hide();
+            $("#ortho").hide();
+            $("#info90").html("");
         } else {
             $("#slider").hide();
             $("#txtInput").show();
             $("#buildBtn").show();
+            $("#ortho").show();
+            $("#info90").html("orthogonal");
         }
     }
 
@@ -118,8 +122,9 @@ export class Controller {
         var word = $("#txtInput").val().split(" ");
         var charArrStatic = [];
         var charArr = [];
+        var charArr90 = [];
         var numOfChar = 0;
-        var chars;
+        var chars;        
 
         for (let i = 0; i < word.length; i++) {
             chars = word[i].split("|");
@@ -138,18 +143,25 @@ export class Controller {
             }
             charArrStatic.push.apply(charArrStatic, charArr[i]);
         }
+        this.setRow(word.length);
+        this.setCol(numOfChar);
         
-        if ($('#integer').is(':checked')) {
-            this.setRow(parseInt($('#slider').val()));
-            this.setCol(parseInt($('#slider').val()));
-        } else {
-            this.setRow(word.length);
-            this.setCol(numOfChar);
-        }
+        if ($('#ortho').is(':checked')){
+            charArrStatic = [];
+            charArr90 = new Array(numOfChar);
+            for (let i = 0; i < numOfChar; i++) {
+                charArr90[i]= new Array(word.length);
+                for (let j = 0; j < word.length; j++) {
+                    charArr90[i][j] = charArr[j][i];
+                }
+                charArrStatic.push.apply(charArrStatic, charArr90[i]);
+            }
+            this.setCol(word.length);
+            this.setRow(numOfChar);
+        }          
 
         return charArrStatic;
     }
-
 
     //init solution for comparison
     initSolution() {
@@ -188,7 +200,13 @@ export class Controller {
         let wChunk = this.wordChunk();
         let seq = [];
         this.tileMat = new TileMatrix();
-        this.evaluation = new Evaluation();
+        this.evaluation = new Evaluation();            
+
+        if ($('#integer').is(':checked')) {
+            this.setRow(parseInt($('#slider').val()));
+            this.setCol(parseInt($('#slider').val()));
+        }
+
         this.tileArr = this.tileMat.createTileMat(this.getRC());
 
         if (preview) {
