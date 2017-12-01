@@ -79,12 +79,16 @@ export class Controller {
             $("#buildBtn").hide();
             $("#ortho").hide();
             $("#info90").html("");
+            $("#rev").hide();
+            $("#revInfo").html("");
         } else {
             $("#slider").hide();
             $("#txtInput").show();
             $("#buildBtn").show();
             $("#ortho").show();
             $("#info90").html("orthogonal");
+            $("#rev").show();
+            $("#revInfo").html("reverse");
         }
     }
 
@@ -124,7 +128,7 @@ export class Controller {
         var charArr = [];
         var charArr90 = [];
         var numOfChar = 0;
-        var chars;        
+        var chars;
 
         for (let i = 0; i < word.length; i++) {
             chars = word[i].split("|");
@@ -145,20 +149,20 @@ export class Controller {
         }
         this.setRow(word.length);
         this.setCol(numOfChar);
-        
-        if ($('#ortho').is(':checked')){
+
+        if ($('#ortho').is(':checked')) {
             charArrStatic = [];
             charArr90 = new Array(numOfChar);
             for (let i = 0; i < numOfChar; i++) {
-                charArr90[i]= new Array(word.length);
+                charArr90[i] = new Array(word.length);
                 for (let j = 0; j < word.length; j++) {
-                    charArr90[i][j] = charArr[j][i];
+                    charArr90[i][j] = (!$('#rev').is(':checked')) ? charArr[(word.length - 1) - j][i] : charArr[j][i];
                 }
                 charArrStatic.push.apply(charArrStatic, charArr90[i]);
             }
             this.setCol(word.length);
             this.setRow(numOfChar);
-        }          
+        }
 
         return charArrStatic;
     }
@@ -200,7 +204,7 @@ export class Controller {
         let wChunk = this.wordChunk();
         let seq = [];
         this.tileMat = new TileMatrix();
-        this.evaluation = new Evaluation();            
+        this.evaluation = new Evaluation();
 
         if ($('#integer').is(':checked')) {
             this.setRow(parseInt($('#slider').val()));
