@@ -75,19 +75,13 @@ export class Controller {
     mode() {
         if ($('#integer').is(':checked')) {
             $("#slider").show();
-            $("#txtInput").hide();
-            $("#buildBtn").hide();
-            $("#ortho").hide();
-            $("#info90").html("");
-            $("#rev").hide();
+            $(".mxnChar").hide();            
+            $("#info90").html("");           
             $("#revInfo").html("");
         } else {
             $("#slider").hide();
-            $("#txtInput").show();
-            $("#buildBtn").show();
-            $("#ortho").show();
-            $("#info90").html("orthogonal");
-            $("#rev").show();
+            $(".mxnChar").show();           
+            $("#info90").html("orthogonal");         
             $("#revInfo").html("reverse");
         }
     }
@@ -123,12 +117,12 @@ export class Controller {
 
     //string in chunks, fill spaces with hashtags
     wordChunk() {
-        var word = $("#txtInput").val().split(" ");
-        var charArrStatic = [];
-        var charArr = [];
-        var charArr90 = [];
-        var numOfChar = 0;
-        var chars;
+        let word = $("#txtInput").val().split(" ");
+        let charArrStatic = [];
+        let charArr = [];
+        let charArrCp = [];
+        let numOfChar = 0;
+        let chars;
 
         for (let i = 0; i < word.length; i++) {
             chars = word[i].split("|");
@@ -139,32 +133,40 @@ export class Controller {
         }
 
         for (let i = 0; i < word.length; i++) {
-            if (charArr[i].length < numOfChar) {
-                let addHash = numOfChar - charArr[i].length;
+            charArrCp[i] = new Array(word.length);
+            charArrCp[i] = ($('#rev').is(':checked')) ? charArr[(word.length - 1) - i] : charArr[i];
+            if (charArrCp[i].length < numOfChar) {
+                let addHash = numOfChar - charArrCp[i].length;
                 for (let j = 0; j < addHash; j++) {
-                    charArr[i].push("#");
+                    charArrCp[i].push("#");
                 }
             }
-            charArrStatic.push.apply(charArrStatic, charArr[i]);
+            charArrStatic.push.apply(charArrStatic, charArrCp[i]);
         }
         this.setRow(word.length);
-        this.setCol(numOfChar);
+        this.setCol(numOfChar);        
 
-        if ($('#ortho').is(':checked')) {
-            charArrStatic = [];
-            charArr90 = new Array(numOfChar);
-            for (let i = 0; i < numOfChar; i++) {
-                charArr90[i] = new Array(word.length);
-                for (let j = 0; j < word.length; j++) {
-                    charArr90[i][j] = (!$('#rev').is(':checked')) ? charArr[(word.length - 1) - j][i] : charArr[j][i];
-                }
-                charArrStatic.push.apply(charArrStatic, charArr90[i]);
+        return ($('#ortho').is(':checked')) ? this.rotateChunk(charArrCp) : charArrStatic;
+    }
+
+    //rotate puzzle by 90°
+    rotateChunk(charArr){
+        let numOfChar = charArr[0].length;
+        let wordlen = charArr.length;
+        let charArrStatic90 = [];
+        let charArr90 = new Array(numOfChar);
+        
+        for (let i = 0; i < numOfChar; i++) {
+            charArr90[i] = new Array(wordlen);
+            for (let j = 0; j < wordlen; j++) {
+                charArr90[i][j] = charArr[j][i];
             }
-            this.setCol(word.length);
-            this.setRow(numOfChar);
+            charArrStatic90.push.apply(charArrStatic90, charArr90[i]);
         }
-
-        return charArrStatic;
+        this.setCol(wordlen);
+        this.setRow(numOfChar);
+        
+        return charArrStatic90;
     }
 
     //init solution for comparison
