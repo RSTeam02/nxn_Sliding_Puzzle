@@ -1,5 +1,6 @@
 # (M)NxN Sliding Puzzle
 
++ 3.12: split wordchunk method into two methods, seperate rotation part 
 + 1.12: rotate word chunks by 90 degrees clockwise horizontally or vertically (check orthogonal, rebuild)
 + 25.11: now working with rectangular puzzle structure (mxn, puzzle builder) => build puzzles with variable word length and number of words without inserting "#" spaces.
 + 24.11: build your own puzzle with characters => split up the entered word into characters, a space between words indicates a new row. Check which property is the greatest (number of rows or columns). the greatest number will be the square-number of the raster.
