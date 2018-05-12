@@ -24,9 +24,9 @@ export class Controller {
         this.initRaster(true);
         this.btnListener();
         this.formatInfo();
+        this.aniCheck();
 
     }
-
 
     setRow(m) {
         this.mxn.row = m;
@@ -59,6 +59,14 @@ export class Controller {
             this.initRaster(false);
             this.tileListener();
         });
+
+        $("#ani").click(()=>{
+           this.aniCheck();
+        });
+    }
+
+    aniCheck(){
+        $("#ani").prop("checked") ? $("#speed").attr("disabled", false) : $("#speed").attr("disabled", true);
     }
 
     initView(seq, wc) {
@@ -88,21 +96,21 @@ export class Controller {
 
     //mxn tiles react on clicks, events
     tileListener() {
-        //handler/listener for each tile, compare with solution after each shift 
-
+        //handler/listener for each tile, compare with solution after each shift
         for (let i = 0; i < this.tileArr.length; i++) {
             for (let j = 0; j < this.tileArr[i].length; j++) {
                 //console.log(this.tileArr.length +" " +this.tileArr[i].length)
                 (() => {
                     let handler = () => {
-                        this.xyControl(this.tileArr[i][j].sId, this.tileArr[i][j].swapVal - 1, (this.tileArr.length * this.tileArr[i].length) - 1);
-                        this.evaluation.evaluate((cb) => {
-                            if (cb === "Solved!") {
-                                this.view.playerInfo(cb);
-                                document.getElementById("shape" + ((this.getRC().row * this.getRC().col) - 1)).setAttribute("fill", "black");
-                                document.dispatchEvent(this.removeEvent);
-                            }
-                        }, this.solution);
+                        this.xyControl(this.tileArr[i][j].sId, this.tileArr[i][j].swapVal - 1, (this.tileArr.length * this.tileArr[i].length) - 1,()=>{
+                            this.evaluation.evaluate((cb) => {
+                                if (cb === "Solved!") {
+                                    this.view.playerInfo(cb);
+                                    document.getElementById("shape" + ((this.getRC().row * this.getRC().col) - 1)).setAttribute("fill", "black");
+                                    document.dispatchEvent(this.removeEvent);
+                                }
+                            }, this.solution);
+                        });                       
                     };
                     this.clickListener(true, this.tileArr[i][j], handler);
                     document.addEventListener("removeListener", () => {
@@ -216,12 +224,12 @@ export class Controller {
         this.tileArr = this.tileMat.createTileMat(this.getRC());
 
         if (preview) {
-            seq = new Shuffle().previewOrder(this.tileArr);
+            seq = new Shuffle().randomOrder(this.tileArr, preview);
             this.initView(seq, wChunk);
             this.solution = this.initSolution();
             document.getElementById(`shape${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("fill", "black");
         } else {
-            seq = new Shuffle().randomOrder(this.tileArr);
+            seq = new Shuffle().randomOrder(this.tileArr, preview);
             this.initView(seq, wChunk);
             this.initSeq(seq);
         }
@@ -230,43 +238,53 @@ export class Controller {
     }
 
     //control direction each tile
-    xyControl(tile, x, lastElement) {
+    xyControl(tile, x, lastElement, cb) { 
         lastElement = document.getElementById("shape" + lastElement);
+        var finished = false;
         //swap rows with last, avoid collisions y-axis 
         if (parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x"))) {
+            
             if (tile.id === "shape" + x && parseInt(tile.getAttribute("y")) === parseInt(lastElement.getAttribute("y")) + 30) {
                 if (parseInt(tile.getAttribute("y")) - 30 === parseInt(lastElement.getAttribute("y"))) {
-                    this.swapYLast(tile, lastElement, -30)
+                    cb(this.swapXYLast("y", tile, lastElement, -30, cb))
                 }
             } else {
                 if (parseInt(tile.getAttribute("y")) + 30 === parseInt(lastElement.getAttribute("y"))) {
-                    this.swapYLast(tile, lastElement, 30);
+                    cb(this.swapXYLast("y", tile, lastElement, 30, cb));
                 }
-            }
+            }          
         }
         //swap cols with last, avoid collisions x-axis    
         if (parseInt(tile.getAttribute("y")) === parseInt(lastElement.getAttribute("y"))) {
             if (tile.id === "shape" + x && parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x")) + 30) {
                 if (parseInt(tile.getAttribute("x")) - 30 === parseInt(lastElement.getAttribute("x"))) {
-                    this.swapXLast(tile, lastElement, -30);
+                    cb(this.swapXYLast("x", tile, lastElement, -30, cb));
                 }
             } else {
                 if (parseInt(tile.getAttribute("x")) + 30 === parseInt(lastElement.getAttribute("x"))) {
-                    this.swapXLast(tile, lastElement, 30);
+                    cb(this.swapXYLast("x", tile, lastElement, 30, cb));
                 }
             }
         }
-
     }
+
     //swap tile with gap
-    swapXLast(tile, lastElement, len) {
-        tile.setAttribute("x", parseInt(tile.getAttribute("x")) + len);
-        lastElement.setAttribute("x", parseInt(lastElement.getAttribute("x")) - len);
-    }
-
-    swapYLast(tile, lastElement, len) {
-        tile.setAttribute("y", parseInt(tile.getAttribute("y")) + len);
-        lastElement.setAttribute("y", parseInt(lastElement.getAttribute("y")) - len);
+    swapXYLast(axis, tile, lastElement, len, call) {
+        var cnt =0;
+        var currentPos = parseInt(tile.getAttribute(axis));
+        if($('#ani').prop('checked')){            
+            var x = setInterval(() => {            
+                tile.setAttribute(axis, currentPos + cnt);
+                if(cnt == len){
+                    clearInterval(x);
+                    call();
+                }
+                (len < 0) ? cnt-- : cnt++;
+            },  $("#speed").attr("max")-$("#speed").val());
+        }else{            
+            tile.setAttribute(axis, parseInt(tile.getAttribute(axis)) + len);
+        }
+        lastElement.setAttribute(axis, parseInt(lastElement.getAttribute(axis)) - len);
     }
 
 }

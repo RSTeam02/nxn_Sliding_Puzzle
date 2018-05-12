@@ -1,5 +1,7 @@
 # (M)NxN Sliding Puzzle
 
++ 12.05: animate character shifting, choose speed range slider  
++ 12.05: swap methods for both axis summarized in one 
 + 3.12: split wordchunk method into two methods, seperate rotation part 
 + 1.12: rotate word chunks by 90 degrees clockwise horizontally or vertically (check orthogonal, rebuild)
 + 25.11: now working with rectangular puzzle structure (mxn, puzzle builder) => build puzzles with variable word length and number of words without inserting "#" spaces.
