@@ -106,7 +106,8 @@ export class Controller {
                             this.evaluation.evaluate((cb) => {
                                 if (cb === "Solved!") {
                                     this.view.playerInfo(cb);
-                                    document.getElementById("shape" + ((this.getRC().row * this.getRC().col) - 1)).setAttribute("fill", "black");
+                                    document.getElementById(`shape${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("fill", "black");
+                                    document.getElementById(`rect${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("stroke", "black");
                                     document.dispatchEvent(this.removeEvent);
                                 }
                             }, this.solution);
@@ -228,6 +229,7 @@ export class Controller {
             this.initView(seq, wChunk);
             this.solution = this.initSolution();
             document.getElementById(`shape${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("fill", "black");
+            document.getElementById(`rect${((this.getRC().row * this.getRC().col) - 1)}`).setAttribute("stroke", "black");
         } else {
             seq = new Shuffle().randomOrder(this.tileArr, preview);
             this.initView(seq, wChunk);
@@ -238,43 +240,47 @@ export class Controller {
     }
 
     //control direction each tile
-    xyControl(tile, x, lastElement, cb) { 
-        lastElement = document.getElementById("shape" + lastElement);
+    xyControl(tile, id, lastElement, cb) { 
+        var le = document.getElementById(`shape${lastElement}`);
         var finished = false;
         //swap rows with last, avoid collisions y-axis 
-        if (parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x"))) {
+        if (parseInt(tile.getAttribute("x")) === parseInt(le.getAttribute("x"))) {
             
-            if (tile.id === "shape" + x && parseInt(tile.getAttribute("y")) === parseInt(lastElement.getAttribute("y")) + 30) {
-                if (parseInt(tile.getAttribute("y")) - 30 === parseInt(lastElement.getAttribute("y"))) {
-                    cb(this.swapXYLast("y", tile, lastElement, -30, cb))
+            if (tile.id === "shape" + id && parseInt(tile.getAttribute("y")) === parseInt(le.getAttribute("y")) + 30) {
+                if (parseInt(tile.getAttribute("y")) - 30 === parseInt(le.getAttribute("y"))) {
+                    cb(this.swapXYLast("y", id, le, -30, cb))
                 }
             } else {
-                if (parseInt(tile.getAttribute("y")) + 30 === parseInt(lastElement.getAttribute("y"))) {
-                    cb(this.swapXYLast("y", tile, lastElement, 30, cb));
+                if (parseInt(tile.getAttribute("y")) + 30 === parseInt(le.getAttribute("y"))) {
+                    cb(this.swapXYLast("y", id, le, 30, cb));
                 }
             }          
         }
         //swap cols with last, avoid collisions x-axis    
-        if (parseInt(tile.getAttribute("y")) === parseInt(lastElement.getAttribute("y"))) {
-            if (tile.id === "shape" + x && parseInt(tile.getAttribute("x")) === parseInt(lastElement.getAttribute("x")) + 30) {
-                if (parseInt(tile.getAttribute("x")) - 30 === parseInt(lastElement.getAttribute("x"))) {
-                    cb(this.swapXYLast("x", tile, lastElement, -30, cb));
+        if (parseInt(tile.getAttribute("y")) === parseInt(le.getAttribute("y"))) {
+            if (tile.id === "shape" + id && parseInt(tile.getAttribute("x")) === parseInt(le.getAttribute("x")) + 30) {
+                if (parseInt(tile.getAttribute("x")) - 30 === parseInt(le.getAttribute("x"))) {
+                    cb(this.swapXYLast("x", id, le, -30, cb));
                 }
             } else {
-                if (parseInt(tile.getAttribute("x")) + 30 === parseInt(lastElement.getAttribute("x"))) {
-                    cb(this.swapXYLast("x", tile, lastElement, 30, cb));
+                if (parseInt(tile.getAttribute("x")) + 30 === parseInt(le.getAttribute("x"))) {
+                    cb(this.swapXYLast("x", id, le, 30, cb));
                 }
             }
         }
     }
 
     //swap tile with gap
-    swapXYLast(axis, tile, lastElement, len, call) {
+    swapXYLast(axis, id, le, len, call) {
         var cnt =0;
+        var tile = document.getElementById(`shape${id}`);
+        var rect = document.getElementById(`rect${id}`);
         var currentPos = parseInt(tile.getAttribute(axis));
+        var currentPosRect = parseInt(rect.getAttribute(axis));
         if($('#ani').prop('checked')){            
             var x = setInterval(() => {            
                 tile.setAttribute(axis, currentPos + cnt);
+                rect.setAttribute(axis, currentPosRect + cnt);
                 if(cnt == len){
                     clearInterval(x);
                     call();
@@ -283,8 +289,10 @@ export class Controller {
             },  $("#speed").attr("max")-$("#speed").val());
         }else{            
             tile.setAttribute(axis, parseInt(tile.getAttribute(axis)) + len);
+            rect.setAttribute(axis, parseInt(rect.getAttribute(axis)) + len);
+            call();
         }
-        lastElement.setAttribute(axis, parseInt(lastElement.getAttribute(axis)) - len);
+        le.setAttribute(axis, parseInt(le.getAttribute(axis)) - len);
     }
 
 }

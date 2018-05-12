@@ -1,5 +1,6 @@
 # (M)NxN Sliding Puzzle
 
++ 12.05: animate square shifting
 + 12.05: animate character shifting, choose speed with range slider  
 + 12.05: swap methods for both axis summarized in one 
 + 3.12: split wordchunk method into two methods, seperate rotation part 
