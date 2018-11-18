@@ -29,7 +29,7 @@
             user-select: none;
         }
 
-        .range {
+        #speed, #slider {
             -webkit-appearance: none;
             width: 50%;
             height: 10px;
@@ -40,11 +40,11 @@
             -webkit-transition: .2s;
             transition: opacity .2s;
         }
-        .range:hover{
+        #speed:hover, #slider:hover{
             opacity: 1;
         }
 
-        .range::-webkit-slider-thumb {
+        #speed::-webkit-slider-thumb ,#slider::-webkit-slider-thumb{
             -webkit-appearance: none;
             appearance: none;
             width: 15px;
@@ -53,7 +53,7 @@
             cursor: pointer;
         }
         
-        .range::-moz-range-thumb {
+        #speed::-moz-range-thumb, #slider::-moz-range-thumb{
             width: 15px;
             height: 25px;
             background: grey;         
@@ -94,14 +94,14 @@
                 <input class="mode" type="radio" id="builder" name="intChar">Puzzle Builder</input>
             </fieldset>
             <fieldset>
-                <input class="mxn" type="range" min="2" max="30" value="2" id="slider" class="range" />                
+                <input class="mxn" type="range" min="2" max="30" value="2" id="slider" />                
                 <input class="mxnChar" type="text" id="txtInput" value="H|e|l|l|o P|u|zz|l|e W|o|r|l|d" />
                 <input class="mxnChar" type="checkbox" id="ortho" /><span id="info90"></span><input class="mxnChar" type="checkbox" id="rev"><span id="revInfo"></span><br>
                 <input class="mxnChar" type="button" value="build puzzle" id="buildBtn" />               
             </fieldset>
             <fieldset>
                 <legend><input type="checkbox" id="ani" />Shift-Animation</legend>
-                slow<input type="range" min="5" max="30" value="30" step=5 id="speed" class="range" />fast
+                slow<input type="range" min="5" max="30" value="30" step=5 id="speed" />fast
             </fieldset>
             <input type="button" value="new game" id="ng">            
         </fieldset>
