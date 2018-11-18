@@ -4,13 +4,11 @@
 <head>
     <meta charset="utf-8">
     <style>
-        .txt {
-            opacity: .7;
+        .txt {           
             font-size: 15px;
         }
 
-        form {
-            opacity: .7;
+        form {         
             font-size: 15px;
         }
 
@@ -75,6 +73,10 @@
                 margin-left: 28%;
             }
         }
+        input#integer, input#builder, input#ani, input#ortho{
+            width: 1.5em;
+            height: 1.5em;
+        }
     </style>
 
 </head>
@@ -90,17 +92,17 @@
             <legend id="formatInfo">
             </legend>
             <fieldset>
-                <input class="mode" type="radio" id="integer" name="intChar" checked>Integer Mode</input>
-                <input class="mode" type="radio" id="builder" name="intChar">Puzzle Builder</input>
+                <input class="mode" type="radio" id="integer" name="intChar" checked><label for="integer"></label>Integer Mode</input>
+                <input class="mode" type="radio" id="builder" name="intChar"><label for="builder"></label>Puzzle Builder</input>
             </fieldset>
             <fieldset>
                 <input class="mxn" type="range" min="2" max="30" value="2" id="slider" />                
                 <input class="mxnChar" type="text" id="txtInput" value="H|e|l|l|o P|u|zz|l|e W|o|r|l|d" />
-                <input class="mxnChar" type="checkbox" id="ortho" /><span id="info90"></span><input class="mxnChar" type="checkbox" id="rev"><span id="revInfo"></span><br>
+                <input class="mxnChar" type="checkbox" id="ortho" /><label for="ortho"></label><span id="info90"></span><input class="mxnChar" type="checkbox" id="rev"><span id="revInfo"></span><br>
                 <input class="mxnChar" type="button" value="build puzzle" id="buildBtn" />               
             </fieldset>
             <fieldset>
-                <legend><input type="checkbox" id="ani" />Shift-Animation</legend>
+                <legend><input type="checkbox" id="ani" /><label for="ani"></label>Shift-Animation</legend>
                 slow<input type="range" min="5" max="30" value="30" step=5 id="speed" />fast
             </fieldset>
             <input type="button" value="new game" id="ng">            
